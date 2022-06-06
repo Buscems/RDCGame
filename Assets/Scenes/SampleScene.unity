@@ -1508,12 +1508,13 @@ MonoBehaviour:
   speed: 7
   velocity: {x: 0, y: 0}
   inAirAccelerationRate: 0.002
-  accelerationRate: 0.009
+  accelerationRate: 0.0075
   decelerationRate: 0.005
-  gravityUp: 35
-  gravityDown: 60
+  gravityUp: 45
+  gravityDown: 75
   jumpVel: 12
-  jumpTimerMax: 0.2
+  movingJumpVel: 0
+  jumpTimerMax: 0.15
   maxDownVel: 500
   onPlatformTimer: 0
   onPlatformTimerMax: 0.075

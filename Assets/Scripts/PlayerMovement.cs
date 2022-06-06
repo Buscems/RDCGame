@@ -29,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     public float gravityUp;
     public float gravityDown;
     public float jumpVel;
+    public float movingJumpVel;
     public float jumpTimerMax;
     bool isJumping;
     float jumpTimer;
