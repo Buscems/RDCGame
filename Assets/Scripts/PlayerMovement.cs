@@ -75,6 +75,10 @@ public class PlayerMovement : MonoBehaviour
             //Moving Forward
             if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
             {
+                if (acceleration <= 0)
+                {
+                    acceleration = 0;
+                }
                 if (acceleration < 1)
                 {
                     acceleration += accelerationRate;
@@ -88,6 +92,10 @@ public class PlayerMovement : MonoBehaviour
             //Moving Backward
             if (myPlayer.GetAxisRaw("MoveHorizontal") < 0)
             {
+                if (acceleration >= 0)
+                {
+                    acceleration = 0;
+                }
                 if (acceleration > -1)
                 {
                     acceleration -= accelerationRate;
@@ -151,24 +159,49 @@ public class PlayerMovement : MonoBehaviour
         velocity.x = speed * acceleration;
 
         //jump logic
-        if (onPlatformTimer > 0)
+        if (Mathf.Abs(velocity.x) > 0)
         {
-            if (myPlayer.GetButtonDown("Jump"))
+            if (onPlatformTimer > 0)
             {
-                velocity.y = jumpVel;
-                jumpTimer = jumpTimerMax;
-                isJumping = true;
+                if (myPlayer.GetButtonDown("Jump"))
+                {
+                    velocity.y = movingJumpVel;
+                    jumpTimer = jumpTimerMax;
+                    isJumping = true;
+                }
+            }
+            if (myPlayer.GetButton("Jump") && isJumping)
+            {
+                velocity.y = movingJumpVel;
+                jumpTimer -= Time.deltaTime;
+            }
+
+            if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
+            {
+                isJumping = false;
             }
         }
-        if (myPlayer.GetButton("Jump") && isJumping)
+        else if (Mathf.Abs(velocity.x) == 0)
         {
-            velocity.y = jumpVel;
-            jumpTimer -= Time.deltaTime;
-        }
+            if (onPlatformTimer > 0)
+            {
+                if (myPlayer.GetButtonDown("Jump"))
+                {
+                    velocity.y = jumpVel;
+                    jumpTimer = jumpTimerMax;
+                    isJumping = true;
+                }
+            }
+            if (myPlayer.GetButton("Jump") && isJumping)
+            {
+                velocity.y = jumpVel;
+                jumpTimer -= Time.deltaTime;
+            }
 
-        if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
-        {
-            isJumping = false;
+            if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
+            {
+                isJumping = false;
+            }
         }
 
 

@@ -1513,7 +1513,7 @@ MonoBehaviour:
   gravityUp: 45
   gravityDown: 75
   jumpVel: 12
-  movingJumpVel: 0
+  movingJumpVel: 15
   jumpTimerMax: 0.15
   maxDownVel: 500
   onPlatformTimer: 0
