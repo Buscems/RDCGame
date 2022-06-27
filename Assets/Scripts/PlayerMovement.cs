@@ -25,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     public float accelerationRate;
     public float decelerationRate;
 
+    [Header("Attack")]
+    bool isAttacking;
+
     [Header("Gravity Variables")]
     public float gravityUp;
     public float gravityDown;
@@ -38,6 +41,10 @@ public class PlayerMovement : MonoBehaviour
     public float onPlatformTimerMax;
     public bool onTopOfPlatform;
 
+    [Header("Animator")]
+    Animator playerAnimator;
+    public SpriteRenderer playerSprite;
+
     private void Awake()
     {
         //Rewired Code
@@ -50,6 +57,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        playerAnimator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -68,6 +76,18 @@ public class PlayerMovement : MonoBehaviour
 
     void Movement()
     {
+
+        //animation logic
+        playerAnimator.SetFloat("speed", Mathf.Abs(velocity.x));
+        playerAnimator.SetBool("onGround", onTopOfPlatform);
+        if(velocity.x < 0)
+        {
+            playerSprite.flipX = true;
+        }
+        else
+        {
+            playerSprite.flipX = false;
+        }
 
         //Acceleration logic on the ground
         if (onTopOfPlatform)
@@ -215,6 +235,11 @@ public class PlayerMovement : MonoBehaviour
         {
             onPlatformTimer -= Time.deltaTime;
         }
+    }
+
+    void SwordAttack()
+    {
+        if()
     }
 
     void Gravity()
