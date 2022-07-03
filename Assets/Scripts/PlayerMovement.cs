@@ -188,6 +188,8 @@ public class PlayerMovement : MonoBehaviour
                     velocity.y = movingJumpVel;
                     jumpTimer = jumpTimerMax;
                     isJumping = true;
+                    playerAnimator.ResetTrigger("land");
+                    playerAnimator.SetTrigger("jump");
                 }
             }
             if (myPlayer.GetButton("Jump") && isJumping)
@@ -210,6 +212,8 @@ public class PlayerMovement : MonoBehaviour
                     velocity.y = jumpVel;
                     jumpTimer = jumpTimerMax;
                     isJumping = true;
+                    playerAnimator.ResetTrigger("land");
+                    playerAnimator.SetTrigger("jump");
                 }
             }
             if (myPlayer.GetButton("Jump") && isJumping)
@@ -239,7 +243,10 @@ public class PlayerMovement : MonoBehaviour
 
     void SwordAttack()
     {
-        if()
+        if (!isAttacking)
+        {
+
+        }
     }
 
     void Gravity()
@@ -270,6 +277,7 @@ public class PlayerMovement : MonoBehaviour
                 { //am I hitting the top of the platform?
 
                     onTopOfPlatform = true;
+                    playerAnimator.SetTrigger("land");
                 }
                 //am I hitting the bottom of a platform?
                 if (contact.normal.y < 0)
