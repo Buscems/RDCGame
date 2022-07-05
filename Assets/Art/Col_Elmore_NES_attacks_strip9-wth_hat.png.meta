@@ -111,7 +111,7 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -130,9 +130,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_1
       rect:
         serializedVersion: 2
-        x: 48
+        x: 80
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -151,9 +151,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_2
       rect:
         serializedVersion: 2
-        x: 96
+        x: 160
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -172,9 +172,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_3
       rect:
         serializedVersion: 2
-        x: 144
+        x: 240
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -193,9 +193,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_4
       rect:
         serializedVersion: 2
-        x: 192
+        x: 320
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -214,9 +214,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_5
       rect:
         serializedVersion: 2
-        x: 240
+        x: 400
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -235,9 +235,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_6
       rect:
         serializedVersion: 2
-        x: 288
+        x: 480
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -256,9 +256,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_7
       rect:
         serializedVersion: 2
-        x: 336
+        x: 560
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -277,9 +277,9 @@ TextureImporter:
       name: Col_Elmore_NES_attacks_strip9-wth_hat_8
       rect:
         serializedVersion: 2
-        x: 384
+        x: 640
         y: 0
-        width: 48
+        width: 80
         height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
