@@ -1735,8 +1735,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.1333334, y: 2.1333334}
-    newSize: {x: 2.1333334, y: 2.1333334}
+    oldSize: {x: 5.3333335, y: 2.1333334}
+    newSize: {x: 5.3333335, y: 2.1333334}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -1761,7 +1761,7 @@ MonoBehaviour:
   velocity: {x: 0, y: 0}
   inAirAccelerationRate: 0.002
   accelerationRate: 0.0075
-  decelerationRate: 0.005
+  decelerationRate: 0.01
   gravityUp: 45
   gravityDown: 75
   jumpVel: 12
@@ -1818,7 +1818,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.1333334, y: 2.1333334}
+  m_Size: {x: 5.3333335, y: 2.1333334}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -1856,7 +1856,7 @@ GameObject:
   - component: {fileID: 2096059309}
   m_Layer: 0
   m_Name: SwordHitbox
-  m_TagString: Untagged
+  m_TagString: PlayerAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

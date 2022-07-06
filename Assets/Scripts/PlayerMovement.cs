@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public float inAirAccelerationRate;
     public float accelerationRate;
     public float decelerationRate;
+    string lastDirection;
+    bool cannotMove;
 
     [Header("Attack")]
     bool isAttacking;
@@ -64,6 +66,12 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         Movement();
+
+        if (myPlayer.GetButtonDown("Attack"))
+        {
+            SwordAttack();
+        }
+
     }
 
     private void FixedUpdate()
@@ -80,154 +88,169 @@ public class PlayerMovement : MonoBehaviour
         //animation logic
         playerAnimator.SetFloat("speed", Mathf.Abs(velocity.x));
         playerAnimator.SetBool("onGround", onTopOfPlatform);
+
         if(velocity.x < 0)
         {
-            playerSprite.flipX = true;
+            lastDirection = "left";
         }
-        else
+        else if(velocity.x > 0)
         {
-            playerSprite.flipX = false;
-        }
-
-        //Acceleration logic on the ground
-        if (onTopOfPlatform)
-        {
-            //Moving Forward
-            if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
-            {
-                if (acceleration <= 0)
-                {
-                    acceleration = 0;
-                }
-                if (acceleration < 1)
-                {
-                    acceleration += accelerationRate;
-                }
-                else if (acceleration > 1)
-                {
-                    acceleration = 1;
-                }
-            }
-
-            //Moving Backward
-            if (myPlayer.GetAxisRaw("MoveHorizontal") < 0)
-            {
-                if (acceleration >= 0)
-                {
-                    acceleration = 0;
-                }
-                if (acceleration > -1)
-                {
-                    acceleration -= accelerationRate;
-                }
-                else if (acceleration < -1)
-                {
-                    acceleration = -1;
-                }
-            }
-
-            //Slowing Down
-            if (myPlayer.GetAxisRaw("MoveHorizontal") == 0)
-            {
-                if (acceleration > 0)
-                {
-                    acceleration -= decelerationRate;
-                }
-                else if (acceleration < 0)
-                {
-                    acceleration += decelerationRate;
-                }
-
-                if (Mathf.Abs(acceleration) <= .01f)
-                {
-                    acceleration = 0;
-                }
-
-            }
+            lastDirection = "right";
         }
 
-        //Acceleration logic in the air
-        if (!onTopOfPlatform)
+        if (lastDirection == "left")
         {
-            //Moving Forward
-            if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
-            {
-                if (acceleration < 1)
-                {
-                    acceleration += inAirAccelerationRate;
-                }
-                else if (acceleration > 1)
-                {
-                    acceleration = 1;
-                }
-            }
-
-            //Moving Backward
-            if (myPlayer.GetAxisRaw("MoveHorizontal") < 0)
-            {
-                if (acceleration > -1)
-                {
-                    acceleration -= inAirAccelerationRate;
-                }
-                else if (acceleration < -1)
-                {
-                    acceleration = -1;
-                }
-            }
+            transform.localScale = new Vector3(-1, 1);
+        }
+        if(lastDirection == "right")
+        {
+            transform.localScale = new Vector3(1, 1);
         }
 
-        velocity.x = speed * acceleration;
-
-        //jump logic
-        if (Mathf.Abs(velocity.x) > 0)
+        if (!cannotMove)
         {
-            if (onPlatformTimer > 0)
+            //Acceleration logic on the ground
+            if (onTopOfPlatform)
             {
-                if (myPlayer.GetButtonDown("Jump"))
+                //Moving Forward
+                if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
+                {
+                    if (acceleration <= 0)
+                    {
+                        acceleration = 0;
+                    }
+                    if (acceleration < 1)
+                    {
+                        acceleration += accelerationRate;
+                    }
+                    else if (acceleration > 1)
+                    {
+                        acceleration = 1;
+                    }
+                }
+
+                //Moving Backward
+                if (myPlayer.GetAxisRaw("MoveHorizontal") < 0)
+                {
+                    if (acceleration >= 0)
+                    {
+                        acceleration = 0;
+                    }
+                    if (acceleration > -1)
+                    {
+                        acceleration -= accelerationRate;
+                    }
+                    else if (acceleration < -1)
+                    {
+                        acceleration = -1;
+                    }
+                }
+
+                //Slowing Down
+                if (myPlayer.GetAxisRaw("MoveHorizontal") == 0)
+                {
+                    if (acceleration > 0)
+                    {
+                        acceleration -= decelerationRate;
+                    }
+                    else if (acceleration < 0)
+                    {
+                        acceleration += decelerationRate;
+                    }
+
+                    if (Mathf.Abs(acceleration) <= .01f)
+                    {
+                        acceleration = 0;
+                    }
+
+                }
+            }
+
+            //Acceleration logic in the air
+            if (!onTopOfPlatform)
+            {
+                //Moving Forward
+                if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
+                {
+                    if (acceleration < 1)
+                    {
+                        acceleration += inAirAccelerationRate;
+                    }
+                    else if (acceleration > 1)
+                    {
+                        acceleration = 1;
+                    }
+                }
+
+                //Moving Backward
+                if (myPlayer.GetAxisRaw("MoveHorizontal") < 0)
+                {
+                    if (acceleration > -1)
+                    {
+                        acceleration -= inAirAccelerationRate;
+                    }
+                    else if (acceleration < -1)
+                    {
+                        acceleration = -1;
+                    }
+                }
+            }
+
+            velocity.x = speed * acceleration;
+
+            //jump logic
+            if (Mathf.Abs(velocity.x) > 0)
+            {
+                if (onPlatformTimer > 0)
+                {
+                    if (myPlayer.GetButtonDown("Jump"))
+                    {
+                        velocity.y = movingJumpVel;
+                        jumpTimer = jumpTimerMax;
+                        isJumping = true;
+                        onTopOfPlatform = false;
+                        playerAnimator.ResetTrigger("land");
+                        playerAnimator.SetTrigger("jump");
+                        onPlatformTimer = 0;
+                    }
+                }
+                if (myPlayer.GetButton("Jump") && isJumping)
                 {
                     velocity.y = movingJumpVel;
-                    jumpTimer = jumpTimerMax;
-                    isJumping = true;
-                    playerAnimator.ResetTrigger("land");
-                    playerAnimator.SetTrigger("jump");
+                    jumpTimer -= Time.deltaTime;
+                }
+
+                if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
+                {
+                    isJumping = false;
                 }
             }
-            if (myPlayer.GetButton("Jump") && isJumping)
+            else if (Mathf.Abs(velocity.x) == 0)
             {
-                velocity.y = movingJumpVel;
-                jumpTimer -= Time.deltaTime;
-            }
-
-            if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
-            {
-                isJumping = false;
-            }
-        }
-        else if (Mathf.Abs(velocity.x) == 0)
-        {
-            if (onPlatformTimer > 0)
-            {
-                if (myPlayer.GetButtonDown("Jump"))
+                if (onPlatformTimer > 0)
+                {
+                    if (myPlayer.GetButtonDown("Jump"))
+                    {
+                        velocity.y = jumpVel;
+                        jumpTimer = jumpTimerMax;
+                        playerAnimator.ResetTrigger("jump");
+                        isJumping = true;
+                        playerAnimator.ResetTrigger("land");
+                        playerAnimator.SetTrigger("jump");
+                    }
+                }
+                if (myPlayer.GetButton("Jump") && isJumping)
                 {
                     velocity.y = jumpVel;
-                    jumpTimer = jumpTimerMax;
-                    isJumping = true;
-                    playerAnimator.ResetTrigger("land");
-                    playerAnimator.SetTrigger("jump");
+                    jumpTimer -= Time.deltaTime;
+                }
+
+                if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
+                {
+                    isJumping = false;
                 }
             }
-            if (myPlayer.GetButton("Jump") && isJumping)
-            {
-                velocity.y = jumpVel;
-                jumpTimer -= Time.deltaTime;
-            }
-
-            if (myPlayer.GetButtonUp("Jump") || jumpTimer <= 0)
-            {
-                isJumping = false;
-            }
         }
-
 
 
         //set timer that will let the player jump slightly off the platform
@@ -245,8 +268,25 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!isAttacking)
         {
-
+            if (onTopOfPlatform)
+            {
+                cannotMove = true;
+                acceleration = 0;
+                velocity = new Vector2(0, 0);
+                playerAnimator.SetTrigger("attack");
+            }
+            else
+            {
+                cannotMove = true;
+                isJumping = false;
+                playerAnimator.SetTrigger("attack");
+            }
         }
+    }
+
+    public void EndAttack()
+    {
+        cannotMove = false;
     }
 
     void Gravity()
