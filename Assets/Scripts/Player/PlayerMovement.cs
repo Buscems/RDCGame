@@ -303,6 +303,10 @@ public class PlayerMovement : MonoBehaviour
                 cannotMove = true;
                 acceleration = 0;
                 velocity = new Vector2(0, 0);
+                if (crouch)
+                {
+                    sword.GetComponent<PlayerAttack>().crouchAttack = true;
+                }
                 playerAnimator.SetTrigger("attack");
             }
             else

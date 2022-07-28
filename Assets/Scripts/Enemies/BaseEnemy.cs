@@ -12,7 +12,8 @@ public class BaseEnemy : MonoBehaviour
     [HideInInspector]
     public float health;
     public float moveSpeed;
-    Vector2 velocity;
+    [HideInInspector]
+    public Vector2 velocity;
     public bool isMovingEnemy;
     bool isDead;
     string lastDirection;
@@ -23,13 +24,15 @@ public class BaseEnemy : MonoBehaviour
     public GameObject[] weapons;
 
     [Header("Aggro")]
+    //[HideInInspector]
     public bool isAggro;
     public BoxCollider2D aggroChecker;
     public Vector2 aggroRange;
     public Transform target;
 
     [Header("Animations")]
-    Animator enemyAnim;
+    [HideInInspector]
+    public Animator enemyAnim;
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +51,12 @@ public class BaseEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //set up some animator variables
+        if (isMovingEnemy)
+        {
+            enemyAnim.SetFloat("speed", Mathf.Abs(velocity.x));
+        }
+
         //Make sure that the enemy is in check with the aggro checker while the enemy is alive
         if (!isDead)
         {
@@ -82,19 +91,23 @@ public class BaseEnemy : MonoBehaviour
             transform.localScale = new Vector3(1, 1);
         }
 
-    }
-
-    private void FixedUpdate()
-    {
         //check if the enemy is aggroed 
         if (isAggro)
         {
             //if the enemy is aggroed and is an enemy that moves move towards the player
             if (isMovingEnemy)
             {
-                velocity = new Vector2(target.position.x - transform.position.x, velocity.y);
-                rb.MovePosition(rb.position + velocity * Time.deltaTime);
+                velocity = new Vector2((target.position.x - transform.position.x) * moveSpeed, velocity.y);
             }
+        }
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (isMovingEnemy)
+        {
+            rb.MovePosition(rb.position + velocity * Time.deltaTime);
         }
     }
 
