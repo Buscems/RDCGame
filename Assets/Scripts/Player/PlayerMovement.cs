@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Platforming Movement")]
     public float speed;
+    public float crouchSpeed;
+    bool crouch;
     [SerializeField]
     Vector2 velocity;
     Rigidbody2D rb;
@@ -29,6 +31,9 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Attack")]
     bool isAttacking;
+    public int startingDamage;
+    int currentDamage;
+    public GameObject sword;
 
     [Header("Gravity Variables")]
     public float gravityUp;
@@ -58,6 +63,9 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //This needs to be changed if saving gets implemented as well as if the player loads into other levels. Should load the previous damage value if it ever gets upgraded.
+        currentDamage = startingDamage;
+
         rb = GetComponent<Rigidbody2D>();
         playerAnimator = GetComponent<Animator>();
     }
@@ -70,6 +78,12 @@ public class PlayerMovement : MonoBehaviour
         if (myPlayer.GetButtonDown("Attack"))
         {
             SwordAttack();
+        }
+
+        //make sure sword damage is what the current damage of the player has
+        if(sword.GetComponent<PlayerAttack>().damage != currentDamage)
+        {
+            sword.GetComponent<PlayerAttack>().damage = currentDamage;
         }
 
     }
@@ -88,8 +102,9 @@ public class PlayerMovement : MonoBehaviour
         //animation logic
         playerAnimator.SetFloat("speed", Mathf.Abs(velocity.x));
         playerAnimator.SetBool("onGround", onTopOfPlatform);
+        playerAnimator.SetBool("crouch", crouch);
 
-        if(velocity.x < 0)
+        if (velocity.x < 0)
         {
             lastDirection = "left";
         }
@@ -109,8 +124,23 @@ public class PlayerMovement : MonoBehaviour
 
         if (!cannotMove)
         {
-            //Acceleration logic on the ground
+
+            //crouch logic
             if (onTopOfPlatform)
+            {
+                if (myPlayer.GetAxis("MoveVertical") < -.7)
+                {
+                    crouch = true;
+                    acceleration = 0;
+                }
+                else
+                {
+                    crouch = false;
+                }
+            }
+
+            //Acceleration logic on the ground
+            if (onTopOfPlatform && !crouch)
             {
                 //Moving Forward
                 if (myPlayer.GetAxisRaw("MoveHorizontal") > 0)
