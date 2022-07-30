@@ -12,7 +12,7 @@ public class PlayerAttack : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        crouchAttack = false;
     }
 
     // Update is called once per frame
@@ -31,24 +31,45 @@ public class PlayerAttack : MonoBehaviour
             {
                 var spear = collision.GetComponent<Spearman>();
                 //Check to see if the player is doing an attack that is opposite the position of the shield
-                if (spear.highShield && crouchAttack)
+                if (!spear.turnedAround)
                 {
-                    collision.GetComponent<BaseEnemy>().health -= damage;
-                    collision.GetComponent<BaseEnemy>().hitEffect.transform.position = collision.transform.position;
-                    collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                    if (spear.highShield && crouchAttack)
+                    {
+                        collision.GetComponent<BaseEnemy>().health -= damage;
+                        collision.GetComponent<BaseEnemy>().hitEffect.transform.position = collision.transform.position;
+                        if (collision.GetComponent<BaseEnemy>().hitEffect.gameObject.activeSelf == false)
+                        {
+                            collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                        }
+                    }
+                    if (spear.lowShield && !crouchAttack)
+                    {
+                        collision.GetComponent<BaseEnemy>().health -= damage;
+                        collision.GetComponent<BaseEnemy>().hitEffect.transform.position = collision.transform.position;
+                        if (collision.GetComponent<BaseEnemy>().hitEffect.gameObject.activeSelf == false)
+                        {
+                            collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                        }
+                    }
                 }
-                if (spear.lowShield && !crouchAttack)
+                else
                 {
                     collision.GetComponent<BaseEnemy>().health -= damage;
                     collision.GetComponent<BaseEnemy>().hitEffect.transform.position = collision.transform.position;
-                    collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                    if (collision.GetComponent<BaseEnemy>().hitEffect.gameObject.activeSelf == false)
+                    {
+                        collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                    }
                 }
             }
             else
             {
                 collision.GetComponent<BaseEnemy>().health -= damage;
                 collision.GetComponent<BaseEnemy>().hitEffect.transform.position = collision.transform.position;
-                collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                if (collision.GetComponent<BaseEnemy>().hitEffect.gameObject.activeSelf == false)
+                {
+                    collision.GetComponent<BaseEnemy>().hitEffect.gameObject.SetActive(true);
+                }
             }
         }
     }

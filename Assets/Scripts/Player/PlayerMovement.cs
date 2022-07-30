@@ -307,6 +307,10 @@ public class PlayerMovement : MonoBehaviour
                 {
                     sword.GetComponent<PlayerAttack>().crouchAttack = true;
                 }
+                else
+                {
+                    sword.GetComponent<PlayerAttack>().crouchAttack = false;
+                }
                 playerAnimator.SetTrigger("attack");
             }
             else

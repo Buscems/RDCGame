@@ -505,64 +505,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &607390782
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 607390783}
-  - component: {fileID: 607390784}
-  m_Layer: 0
-  m_Name: Spear
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &607390783
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 607390782}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 825351795}
-  m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &607390784
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 607390782}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
 --- !u!1 &617529887
 GameObject:
   m_ObjectHideFlags: 0
@@ -581,7 +523,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &617529888
 Transform:
   m_ObjectHideFlags: 0
@@ -777,8 +719,8 @@ GameObject:
   - component: {fileID: 825351797}
   - component: {fileID: 825351796}
   - component: {fileID: 825351798}
-  - component: {fileID: 825351800}
   - component: {fileID: 825351801}
+  - component: {fileID: 825351800}
   m_Layer: 0
   m_Name: Spearman
   m_TagString: Enemy
@@ -799,7 +741,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 746925460}
-  - {fileID: 607390783}
   - {fileID: 1291189721}
   - {fileID: 510597243}
   - {fileID: 1578546441}
@@ -871,6 +812,8 @@ MonoBehaviour:
   moveSpeed: 1
   velocity: {x: 0, y: 0}
   isMovingEnemy: 1
+  isDead: 0
+  noTurn: 0
   hitEffect: {fileID: 617529887}
   deathEffect: {fileID: 3124148101404209149, guid: 8be4bc5502de4c74884bb2e7125e428c, type: 3}
   weapons:
@@ -919,6 +862,11 @@ MonoBehaviour:
   minMaxAttackDelay: {x: 0, y: 0}
   damage: 0
   idealDistanceFromPlayer: 2.5
+  idealRange: 0
+  timerToChangeMovementMinMax: {x: 0.5, y: 1.5}
+  turnedAround: 0
+  turnAroundTimerMinMax: {x: 3, y: 3}
+  slowSpeedMultiplier: 0.15
   distanceBuffer: 0
 --- !u!1 &862962179
 GameObject:
@@ -2180,7 +2128,7 @@ GameObject:
   - component: {fileID: 1578546442}
   - component: {fileID: 1578546443}
   m_Layer: 0
-  m_Name: Spear_strip2_0
+  m_Name: Spear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

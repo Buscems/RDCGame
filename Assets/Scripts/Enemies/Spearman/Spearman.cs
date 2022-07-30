@@ -11,7 +11,7 @@ public class Spearman : MonoBehaviour
     [Header("ShieldPosition")]
     public Vector2 minMaxStanceTimer;
     float shieldTimer;
-    [HideInInspector]
+    //[HideInInspector]
     public bool highShield, lowShield;
 
     [Header("SpearAttack")]
@@ -19,6 +19,16 @@ public class Spearman : MonoBehaviour
     public Vector2 minMaxAttackDelay;
     public int damage;
     public float idealDistanceFromPlayer;
+    [SerializeField]
+    bool idealRange;
+    public Vector2 timerToChangeMovementMinMax;
+    float timerToChangeMovement;
+    bool moveLeft, lookingLeft;
+    //[HideInInspector]
+    public bool turnedAround;
+    public Vector2 turnAroundTimerMinMax;
+    float turnAroundTimer;
+    public float slowSpeedMultiplier;
     [Tooltip("When the player is in the ideal distance for the enemy have the enemy recognize it and move slightly back and forth from the ideal distance based on this number")]
     public float distanceBuffer;
 
@@ -30,6 +40,8 @@ public class Spearman : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         highShield = true;
         shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+        turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+        turnedAround = false;
     }
 
     // Update is called once per frame
@@ -45,14 +57,84 @@ public class Spearman : MonoBehaviour
 
         if (bE.isAggro)
         {
-            if (Mathf.Abs((bE.target.position.x - transform.position.x)) > idealDistanceFromPlayer)
+            //Check if the spearman is in its ideal range of the player
+            if (Mathf.Abs((bE.target.position.x - transform.position.x)) > idealDistanceFromPlayer && !idealRange)
             {
                 bE.velocity = new Vector2((bE.target.position.x - transform.position.x) * bE.moveSpeed, bE.velocity.y);
             }
-            else //Have it do the shimmy sham
+            else if(!idealRange) //Have it do the shimmy sham
             {
-                bE.velocity.x = 0;
+                idealRange = true;
             }
+
+            if (idealRange)
+            {
+
+                //make sure the spearman looks at the player
+                if (bE.target.position.x - transform.position.x < 0)
+                {
+                    //need to fix to make it so that when they first look at the player it recognizes that they are looking left and vice versa
+                    if (!lookingLeft)
+                    {
+                        turnAroundTimer -= Time.deltaTime;
+                        turnedAround = true;
+                        if (turnAroundTimer < 0)
+                        {
+                            transform.localScale = new Vector3(-1, 1);
+                            turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                            turnedAround = false;
+                            lookingLeft = true;
+                        }
+                    }
+                }
+                if (bE.target.position.x - transform.position.x > 0)
+                {
+                    if (lookingLeft)
+                    {
+                        turnAroundTimer -= Time.deltaTime;
+                        turnedAround = true;
+                        if (turnAroundTimer < 0)
+                        {
+                            transform.localScale = new Vector3(1, 1);
+                            turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                            turnedAround = false;
+                            lookingLeft = false;
+                        }
+                    }
+                }
+
+                if (Mathf.Abs(bE.target.position.x - transform.position.x) > (idealDistanceFromPlayer + 2))
+                {
+                    bE.noTurn = false;
+                    idealRange = false;
+                }
+                bE.noTurn = true;
+
+                timerToChangeMovement -= Time.deltaTime;
+                if(timerToChangeMovement < 0)
+                {
+                    if (moveLeft)
+                    {
+                        moveLeft = false;
+                    }
+                    else
+                    {
+                        moveLeft = true;
+                    }
+                    timerToChangeMovement = Random.Range(timerToChangeMovementMinMax.x, timerToChangeMovementMinMax.y);
+                }
+
+                if (moveLeft)
+                {
+                    bE.velocity = new Vector2((bE.target.position.x - transform.position.x) * (bE.moveSpeed * slowSpeedMultiplier), bE.velocity.y);
+                }
+                else
+                {
+                    bE.velocity = new Vector2((transform.position.x - bE.target.position.x) * (bE.moveSpeed * slowSpeedMultiplier), bE.velocity.y);
+                }
+
+            }
+
         }
 
         //Have the spearman switch between high and low shield stances to deflect attacks
@@ -77,9 +159,14 @@ public class Spearman : MonoBehaviour
         bE.enemyAnim.SetBool("highShield", highShield);
     }
 
+
+
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + bE.velocity * Time.deltaTime);
+        if (!bE.isDead)
+        {
+            rb.MovePosition(rb.position + bE.velocity * Time.deltaTime);
+        }
     }
 
 }

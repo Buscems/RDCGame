@@ -15,8 +15,11 @@ public class BaseEnemy : MonoBehaviour
     [HideInInspector]
     public Vector2 velocity;
     public bool isMovingEnemy;
-    bool isDead;
+    [HideInInspector]
+    public bool isDead;
     string lastDirection;
+    [HideInInspector]
+    public bool noTurn;
 
     public GameObject hitEffect;
     public GameObject deathEffect;
@@ -73,22 +76,25 @@ public class BaseEnemy : MonoBehaviour
             Death();
         }
 
-        if (velocity.x < 0)
+        if(!noTurn)
         {
-            lastDirection = "left";
-        }
-        else if (velocity.x > 0)
-        {
-            lastDirection = "right";
-        }
+            if (velocity.x < 0)
+            {
+                lastDirection = "left";
+            }
+            else if (velocity.x > 0)
+            {
+                lastDirection = "right";
+            }
 
-        if (lastDirection == "left")
-        {
-            transform.localScale = new Vector3(-1, 1);
-        }
-        if (lastDirection == "right")
-        {
-            transform.localScale = new Vector3(1, 1);
+            if (lastDirection == "left")
+            {
+                transform.localScale = new Vector3(-1, 1);
+            }
+            if (lastDirection == "right")
+            {
+                transform.localScale = new Vector3(1, 1);
+            }
         }
 
         //check if the enemy is aggroed 
@@ -105,7 +111,7 @@ public class BaseEnemy : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isMovingEnemy)
+        if (isMovingEnemy && !isDead)
         {
             rb.MovePosition(rb.position + velocity * Time.deltaTime);
         }
@@ -115,7 +121,7 @@ public class BaseEnemy : MonoBehaviour
     {
 
         isDead = true;
-
+        velocity.x = 0;
         //change this to use animations later
 
         enemyAnim.SetTrigger("Death");
