@@ -12,18 +12,19 @@ public class Spearman : MonoBehaviour
     public Vector2 minMaxStanceTimer;
     float shieldTimer;
     //[HideInInspector]
-    public bool highShield, lowShield;
+    public bool highShield, lowShield, canChangeShield;
 
     [Header("SpearAttack")]
     [Tooltip("How long to wait between attacks")]
     public Vector2 minMaxAttackDelay;
+    float timerBetweenAttacks;
     public int damage;
     public float idealDistanceFromPlayer;
     [SerializeField]
     bool idealRange;
     public Vector2 timerToChangeMovementMinMax;
     float timerToChangeMovement;
-    bool moveLeft, lookingLeft;
+    bool moveLeft, lookingLeft, firstAggro;
     //[HideInInspector]
     public bool turnedAround;
     public Vector2 turnAroundTimerMinMax;
@@ -31,7 +32,9 @@ public class Spearman : MonoBehaviour
     public float slowSpeedMultiplier;
     [Tooltip("When the player is in the ideal distance for the enemy have the enemy recognize it and move slightly back and forth from the ideal distance based on this number")]
     public float distanceBuffer;
-
+    [HideInInspector]
+    public bool isAttacking;
+    public EnemyAttack spear;
 
     // Start is called before the first frame update
     void Start()
@@ -41,7 +44,10 @@ public class Spearman : MonoBehaviour
         highShield = true;
         shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
         turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+        timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
         turnedAround = false;
+        firstAggro = true;
+        canChangeShield = true;
     }
 
     // Update is called once per frame
@@ -62,7 +68,7 @@ public class Spearman : MonoBehaviour
             {
                 bE.velocity = new Vector2((bE.target.position.x - transform.position.x) * bE.moveSpeed, bE.velocity.y);
             }
-            else if(!idealRange) //Have it do the shimmy sham
+            else if(!idealRange)
             {
                 idealRange = true;
             }
@@ -73,16 +79,23 @@ public class Spearman : MonoBehaviour
                 //make sure the spearman looks at the player
                 if (bE.target.position.x - transform.position.x < 0)
                 {
-                    //need to fix to make it so that when they first look at the player it recognizes that they are looking left and vice versa
+                    
                     if (!lookingLeft)
                     {
-                        turnAroundTimer -= Time.deltaTime;
-                        turnedAround = true;
-                        if (turnAroundTimer < 0)
+                        if (!firstAggro)
                         {
-                            transform.localScale = new Vector3(-1, 1);
-                            turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
-                            turnedAround = false;
+                            turnAroundTimer -= Time.deltaTime;
+                            turnedAround = true;
+                            if (turnAroundTimer < 0)
+                            {
+                                transform.localScale = new Vector3(-1, 1);
+                                turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                turnedAround = false;
+                                lookingLeft = true;
+                            }
+                        }
+                        else
+                        {
                             lookingLeft = true;
                         }
                     }
@@ -91,13 +104,20 @@ public class Spearman : MonoBehaviour
                 {
                     if (lookingLeft)
                     {
-                        turnAroundTimer -= Time.deltaTime;
-                        turnedAround = true;
-                        if (turnAroundTimer < 0)
+                        if (!firstAggro)
                         {
-                            transform.localScale = new Vector3(1, 1);
-                            turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
-                            turnedAround = false;
+                            turnAroundTimer -= Time.deltaTime;
+                            turnedAround = true;
+                            if (turnAroundTimer < 0)
+                            {
+                                transform.localScale = new Vector3(1, 1);
+                                turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                turnedAround = false;
+                                lookingLeft = false;
+                            }
+                        }
+                        else
+                        {
                             lookingLeft = false;
                         }
                     }
@@ -133,28 +153,46 @@ public class Spearman : MonoBehaviour
                     bE.velocity = new Vector2((transform.position.x - bE.target.position.x) * (bE.moveSpeed * slowSpeedMultiplier), bE.velocity.y);
                 }
 
+                //Have the spearman do an attack
+
+                if (!isAttacking)
+                {
+                    timerBetweenAttacks -= Time.deltaTime;
+                    if(timerBetweenAttacks <= 0)
+                    {
+                        isAttacking = true;
+                        canChangeShield = false;
+                        spear.lookingLeft = lookingLeft;
+                        bE.enemyAnim.SetTrigger("attack");
+                        timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
+                    }
+                }
+
             }
 
         }
 
-        //Have the spearman switch between high and low shield stances to deflect attacks
-        shieldTimer -= Time.deltaTime;
-        if(shieldTimer <= 0)
+
+        //Have the spearman switch between high and low shield stances to deflect attacks if they are not attacking
+        if (canChangeShield)
         {
-            if (highShield)
+            shieldTimer -= Time.deltaTime;
+            if (shieldTimer <= 0)
             {
-                lowShield = true;
-                highShield = false;
-                shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-            }
-            else if (lowShield)
-            {
-                highShield = true;
-                lowShield = false;
-                shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+                if (highShield)
+                {
+                    lowShield = true;
+                    highShield = false;
+                    shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+                }
+                else if (lowShield)
+                {
+                    highShield = true;
+                    lowShield = false;
+                    shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+                }
             }
         }
-
         bE.enemyAnim.SetBool("lowShield", lowShield);
         bE.enemyAnim.SetBool("highShield", highShield);
     }
@@ -163,10 +201,16 @@ public class Spearman : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!bE.isDead)
+        if (!bE.isDead && !isAttacking)
         {
             rb.MovePosition(rb.position + bE.velocity * Time.deltaTime);
         }
+    }
+
+    public void EndAttack()
+    {
+        isAttacking = false;
+        canChangeShield = true;
     }
 
 }

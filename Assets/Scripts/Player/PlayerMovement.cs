@@ -15,6 +15,11 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Number identifier for each player, must be above 0")]
     public int playerNum;
 
+    [Header("Health and Knockback")]
+    public int maxHealth;
+    [HideInInspector]
+    public int currentHealth;
+
     [Header("Platforming Movement")]
     public float speed;
     public float crouchSpeed;
@@ -63,6 +68,9 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //When saving gets implemented this needs to be changed so the player doesn't keep going back to full health
+        currentHealth = maxHealth;
+
         //This needs to be changed if saving gets implemented as well as if the player loads into other levels. Should load the previous damage value if it ever gets upgraded.
         currentDamage = startingDamage;
 
@@ -92,8 +100,10 @@ public class PlayerMovement : MonoBehaviour
     {
 
         Gravity();
-
-        rb.MovePosition(rb.position + velocity * Time.deltaTime);
+        if (!cannotMove)
+        {
+            rb.MovePosition(rb.position + velocity * Time.deltaTime);
+        }
     }
 
     void Movement()
@@ -341,6 +351,24 @@ public class PlayerMovement : MonoBehaviour
                 velocity.y -= gravityDown * Time.fixedDeltaTime;
             }
         }
+    }
+
+    public void Knockback(Vector2 knockback)
+    {
+        cannotMove = true;
+        rb.AddForce(knockback);
+        //velocity.y = 0;
+        StartCoroutine(StartKnockback());
+    }
+
+    IEnumerator StartKnockback()
+    {
+        yield return new WaitForSeconds(.5f);
+        while (!onTopOfPlatform)
+        {
+            yield return null;
+        }
+        cannotMove = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collisionInfo)
