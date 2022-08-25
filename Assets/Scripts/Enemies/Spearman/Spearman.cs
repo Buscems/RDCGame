@@ -54,7 +54,7 @@ public class Spearman : MonoBehaviour
     void Update()
     {
         bE.enemyAnim.SetFloat("speed", Mathf.Abs(bE.velocity.x));
-        int dx = bE.target.position.x - transform.position.x;
+        float dx = bE.target.position.x - transform.position.x;
 
         if (bE.isAggro)
         {
@@ -131,11 +131,10 @@ public class Spearman : MonoBehaviour
                     timerToChangeMovement = Random.Range(timerToChangeMovementMinMax.x, timerToChangeMovementMinMax.y);
                 }
 
-                float direction = moveLeft ? 1 : -1;
+                int direction = moveLeft ? 1 : -1;
 
                 bE.velocity = new Vector2(dx * direction * (bE.moveSpeed * slowSpeedMultiplier), bE.velocity.y);
 
-                //Have the spearman do an attack
                 attack();
             }
 
