@@ -2,6 +2,7 @@ using Rewired;
 using Rewired.ControllerExtensions;
 using UnityEngine;
 using Utility;
+using static Utility.AnimatorConstants;
 
 namespace Player
 {
@@ -48,7 +49,7 @@ namespace Player
         void Update()
         {
 
-            anim.SetFloat("direction", direction);
+            anim.SetFloat(Direction, direction);
 
             velocity = new Vector2(myPlayer.GetAxisRaw("MoveHorizontal"), myPlayer.GetAxisRaw("MoveVertical")) * speed;
             if(myPlayer.GetAxis("MoveHorizontal") < .2f && myPlayer.GetAxis("MoveVertical") < .3f && myPlayer.GetAxis("MoveVertical") > -.3f)
@@ -70,11 +71,11 @@ namespace Player
         
             if(Mathf.Abs(myPlayer.GetAxisRaw("MoveHorizontal")) > 0 || Mathf.Abs(myPlayer.GetAxisRaw("MoveVertical")) > 0)
             {
-                anim.SetFloat("Walk", 1);
+                anim.SetFloat(Walk, 1);
             }
             else
             {
-                anim.SetFloat("Walk", 0);
+                anim.SetFloat(Walk, 0);
             }
 
         }
@@ -86,9 +87,9 @@ namespace Player
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.tag == "Area 1")
+            if (collision.CompareTag("Area 1"))
             {
-                fade.anim.SetTrigger("fadeIn");
+                fade.anim.SetTrigger(FadeIn);
             }
         }
 

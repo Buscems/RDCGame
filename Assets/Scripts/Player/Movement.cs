@@ -58,6 +58,7 @@ namespace Player
         [Header("Animator")]
         Animator playerAnimator;
         public SpriteRenderer playerSprite;
+        private Attack _attack;
 
         private void Awake()
         {
@@ -70,6 +71,7 @@ namespace Player
         // Start is called before the first frame update
         void Start()
         {
+            _attack = sword.GetComponent<Attack>();
             //When saving gets implemented this needs to be changed so the player doesn't keep going back to full health
             currentHealth = maxHealth;
 
@@ -317,11 +319,11 @@ namespace Player
                     velocity = new Vector2(0, 0);
                     if (crouch)
                     {
-                        sword.GetComponent<Attack>().crouchAttack = true;
+                        _attack.crouchAttack = true;
                     }
                     else
                     {
-                        sword.GetComponent<Attack>().crouchAttack = false;
+                        _attack.crouchAttack = false;
                     }
                     playerAnimator.SetTrigger("attack");
                 }
@@ -359,7 +361,6 @@ namespace Player
         {
             cannotMove = true;
             rb.AddForce(knockback);
-            //velocity.y = 0;
             StartCoroutine(StartKnockback());
         }
 
@@ -390,11 +391,7 @@ namespace Player
                     //am I hitting the bottom of a platform?
                     if (contact.normal.y < 0)
                     {
-                        //hitHead = true;
                         velocity.y = 0;
-                        //gotHitTimer = 0;
-                        //maxKnockbackTime = 0;
-
                     }
                 }
             }

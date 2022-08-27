@@ -1,23 +1,23 @@
 using UnityEngine;
+using Utility;
+using static Utility.AnimatorConstants;
 
 namespace Enemy
 {
     public class Base : MonoBehaviour
     {
+        private Rigidbody2D _rb;
 
-        Rigidbody2D rb;
-
-        [Header("EnemyStats")]
+        [Header("EnemyStats")] 
         public float maxHealth;
+
+        public Health health { get; set; }
+
         [HideInInspector]
-        public float health;
         public float moveSpeed;
         [HideInInspector]
         public Vector2 velocity;
         public bool isMovingEnemy;
-        [HideInInspector]
-        public bool isDead;
-        string lastDirection;
         [HideInInspector]
         public bool noTurn;
 
@@ -37,14 +37,17 @@ namespace Enemy
         [HideInInspector]
         public Animator enemyAnim;
 
+        private AggroChecker _aggroChecker;
+
         // Start is called before the first frame update
         void Start()
         {
+            _aggroChecker = aggroChecker.GetComponent<AggroChecker>();
 
-            rb = GetComponent<Rigidbody2D>();
+            _rb = GetComponent<Rigidbody2D>();
             enemyAnim = GetComponent<Animator>();
 
-            health = maxHealth;
+            health = new Health(maxHealth, Death);
 
             //Setting up aggro variables
             aggroChecker.size = aggroRange;
@@ -52,89 +55,49 @@ namespace Enemy
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             //set up some animator variables
             if (isMovingEnemy)
             {
-                enemyAnim.SetFloat("speed", Mathf.Abs(velocity.x));
+                enemyAnim.SetFloat(Speed, Mathf.Abs(velocity.x));
             }
 
             //Make sure that the enemy is in check with the aggro checker while the enemy is alive
-            if (!isDead)
-            {
-                this.isAggro = aggroChecker.GetComponent<AggroChecker>().isAggro;
-            }
-            else 
-            { 
-                isAggro = false; 
-            }
-
-            //check if the enemy is dead
-            if(health <= 0 && !isDead)
-            {
-                Death();
-            }
+            isAggro = !health.IsDead() && _aggroChecker.isAggro;
 
             if(!noTurn)
             {
-                if (velocity.x < 0)
-                {
-                    lastDirection = "left";
-                }
-                else if (velocity.x > 0)
-                {
-                    lastDirection = "right";
-                }
-
-                if (lastDirection == "left")
-                {
-                    transform.localScale = new Vector3(-1, 1);
-                }
-                if (lastDirection == "right")
-                {
-                    transform.localScale = new Vector3(1, 1);
-                }
+                var direction = velocity.x > 0 ? 1 : -1;
+                transform.localScale = new Vector3(direction, 1);
             }
 
-            //check if the enemy is aggroed 
-            if (isAggro)
-            {
-                //if the enemy is aggroed and is an enemy that moves move towards the player
-                if (isMovingEnemy)
-                {
-                    velocity = new Vector2((target.position.x - transform.position.x) * moveSpeed, velocity.y);
-                }
-            }
-
+            //check if the enemy is aggroed and is an enemy that moves move towards the player
+            if (!isAggro || !isMovingEnemy) return;
+            velocity = new Vector2((target.position.x - transform.position.x) * moveSpeed, velocity.y);
         }
 
         private void FixedUpdate()
         {
-            if (isMovingEnemy && !isDead)
-            {
-                rb.MovePosition(rb.position + velocity * Time.deltaTime);
-            }
+            if (!isMovingEnemy || health.IsDead()) return;
+            _rb.MovePosition(_rb.position + velocity * Time.deltaTime);
         }
 
-        void Death()
+        private void Death()
         {
-
-            isDead = true;
             velocity.x = 0;
             //change this to use animations later
 
-            enemyAnim.SetTrigger("Death");
-            Instantiate(deathEffect, this.transform.position, Quaternion.identity);
-            if(weapons.Length > 0)
-            {
-                for(int i = 0; i < weapons.Length; i++)
-                {
-                    Destroy(weapons[i]);
-                } 
-            }
-        
+            enemyAnim.SetTrigger(AnimatorConstants.Death);
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+            if (weapons.Length <= 0) return;
+            
+            foreach (var t in weapons) Destroy(t);
         }
 
+        public void Damage(int damage)
+        {
+            health.Damage(damage);
+        }
     }
 }

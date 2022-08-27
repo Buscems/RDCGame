@@ -25,20 +25,18 @@ namespace Enemy
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if(collision.tag == "Player")
-            {
-                var player = collision.GetComponent<Player.Movement>();
-                player.currentHealth -= damage;
+            if (!collision.CompareTag("Player")) return;
+            var player = collision.GetComponent<Player.Movement>();
+            player.currentHealth -= damage;
 
-                if (lookingLeft)
-                {
-                    var reverseKnockback = new Vector2(-knockbackForce.x, knockbackForce.y);
-                    player.Knockback(reverseKnockback);
-                }
-                else
-                {
-                    player.Knockback(knockbackForce);
-                }
+            if (lookingLeft)
+            {
+                var reverseKnockback = new Vector2(-knockbackForce.x, knockbackForce.y);
+                player.Knockback(reverseKnockback);
+            }
+            else
+            {
+                player.Knockback(knockbackForce);
             }
         }
 

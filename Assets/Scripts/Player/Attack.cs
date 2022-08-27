@@ -29,6 +29,7 @@ namespace Player
             if(collision.tag == "Enemy")
             {
                 //This should only apply to the spearman enemy and any others that may be able to block an attack from a high or low stance
+                var enemy = collision.GetComponent<Base>();
                 if (collision.GetComponent<Entity>() != null)
                 {
                     var spear = collision.GetComponent<Entity>();
@@ -37,40 +38,40 @@ namespace Player
                     {
                         if (spear.highShield && crouchAttack)
                         {
-                            collision.GetComponent<Base>().health -= damage;
-                            collision.GetComponent<Base>().hitEffect.transform.position = collision.transform.position;
-                            if (collision.GetComponent<Base>().hitEffect.gameObject.activeSelf == false)
+                            enemy.Damage(damage);
+                            enemy.hitEffect.transform.position = collision.transform.position;
+                            if (enemy.hitEffect.gameObject.activeSelf == false)
                             {
-                                collision.GetComponent<Base>().hitEffect.gameObject.SetActive(true);
+                                enemy.hitEffect.gameObject.SetActive(true);
                             }
                         }
                         if (spear.lowShield && !crouchAttack)
                         {
-                            collision.GetComponent<Base>().health -= damage;
-                            collision.GetComponent<Base>().hitEffect.transform.position = collision.transform.position;
-                            if (collision.GetComponent<Base>().hitEffect.gameObject.activeSelf == false)
+                            enemy.Damage(damage);
+                            enemy.hitEffect.transform.position = collision.transform.position;
+                            if (enemy.hitEffect.gameObject.activeSelf == false)
                             {
-                                collision.GetComponent<Base>().hitEffect.gameObject.SetActive(true);
+                                enemy.hitEffect.gameObject.SetActive(true);
                             }
                         }
                     }
                     else
                     {
-                        collision.GetComponent<Base>().health -= damage;
-                        collision.GetComponent<Base>().hitEffect.transform.position = collision.transform.position;
-                        if (collision.GetComponent<Base>().hitEffect.gameObject.activeSelf == false)
+                        enemy.Damage(damage);
+                        enemy.hitEffect.transform.position = collision.transform.position;
+                        if (enemy.hitEffect.gameObject.activeSelf == false)
                         {
-                            collision.GetComponent<Base>().hitEffect.gameObject.SetActive(true);
+                            enemy.hitEffect.gameObject.SetActive(true);
                         }
                     }
                 }
                 else
                 {
-                    collision.GetComponent<Base>().health -= damage;
-                    collision.GetComponent<Base>().hitEffect.transform.position = collision.transform.position;
-                    if (collision.GetComponent<Base>().hitEffect.gameObject.activeSelf == false)
+                    enemy.Damage(damage);
+                    enemy.hitEffect.transform.position = collision.transform.position;
+                    if (enemy.hitEffect.gameObject.activeSelf == false)
                     {
-                        collision.GetComponent<Base>().hitEffect.gameObject.SetActive(true);
+                        enemy.hitEffect.gameObject.SetActive(true);
                     }
                 }
             }

@@ -1,7 +1,8 @@
 using UnityEngine;
+using Utility;
 
 namespace Enemy.Spearman
-{
+{ 
     public class Entity : MonoBehaviour
     {
         Base bE;
@@ -53,8 +54,8 @@ namespace Enemy.Spearman
         // Update is called once per frame
         void Update()
         {
-            bE.enemyAnim.SetFloat("speed", Mathf.Abs(bE.velocity.x));
-            float dx = bE.target.position.x - transform.position.x;
+            bE.enemyAnim.SetFloat(AnimatorConstants.Speed, Mathf.Abs(bE.velocity.x));
+            var dx = bE.target.position.x - transform.position.x;
 
             if (bE.isAggro)
             {
@@ -161,8 +162,8 @@ namespace Enemy.Spearman
                     }
                 }
             }
-            bE.enemyAnim.SetBool("lowShield", lowShield);
-            bE.enemyAnim.SetBool("highShield", highShield);
+            bE.enemyAnim.SetBool(AnimatorConstants.LowShield, lowShield);
+            bE.enemyAnim.SetBool(AnimatorConstants.HighShield, highShield);
         }
 
         private void attack()
@@ -175,7 +176,7 @@ namespace Enemy.Spearman
                     isAttacking = true;
                     canChangeShield = false;
                     spear.lookingLeft = lookingLeft;
-                    bE.enemyAnim.SetTrigger("attack");
+                    bE.enemyAnim.SetTrigger(AnimatorConstants.Attack1);
                     timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
                 }
             }
@@ -185,7 +186,7 @@ namespace Enemy.Spearman
 
         private void FixedUpdate()
         {
-            if (!bE.isDead && !isAttacking)
+            if (!bE.health.IsDead() && !isAttacking)
             {
                 rb.MovePosition(rb.position + bE.velocity * Time.deltaTime);
             }

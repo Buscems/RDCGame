@@ -9,7 +9,7 @@ namespace Enemy
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if(collision.tag == "Player")
+            if(collision.CompareTag("Player"))
             {
                 isAggro = true;
             }
@@ -17,7 +17,7 @@ namespace Enemy
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.tag == "Player")
+            if (collision.CompareTag("Player"))
             {
                 isAggro = false;
             }
