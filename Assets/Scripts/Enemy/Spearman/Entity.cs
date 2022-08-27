@@ -5,33 +5,28 @@ namespace Enemy.Spearman
 { 
     public class Entity : MonoBehaviour
     {
-        Base bE;
-        Rigidbody2D rb;
+        private Base _bE;
+        private Rigidbody2D _rb;
+        private float _shieldTimer, _timerBetweenAttacks, _turnAroundTimer, _timerToChangeMovement;
+        private bool _idealRange, _moveLeft, _lookingLeft, _firstAggro;
+
 
         [Header("ShieldPosition")]
         public Vector2 minMaxStanceTimer;
-        float shieldTimer;
-        //[HideInInspector]
-        public bool highShield, lowShield, canChangeShield;
+        public bool lowShield, canChangeShield;
 
         [Header("SpearAttack")]
         [Tooltip("How long to wait between attacks")]
         public Vector2 minMaxAttackDelay;
-        float timerBetweenAttacks;
         public int damage;
         public float idealDistanceFromPlayer;
         [SerializeField]
-        bool idealRange;
         public Vector2 timerToChangeMovementMinMax;
-        float timerToChangeMovement;
-        bool moveLeft, lookingLeft, firstAggro;
         //[HideInInspector]
         public bool turnedAround;
         public Vector2 turnAroundTimerMinMax;
-        float turnAroundTimer;
         public float slowSpeedMultiplier;
-        [Tooltip("When the player is in the ideal distance for the enemy have the enemy recognize it and move slightly back and forth from the ideal distance based on this number")]
-        public float distanceBuffer;
+        // [Tooltip("When the player is in the ideal distance for the enemy have the enemy recognize it and move slightly back and forth from the ideal distance based on this number")] public float distanceBuffer;
         [HideInInspector]
         public bool isAttacking;
         public Attack spear;
@@ -39,102 +34,103 @@ namespace Enemy.Spearman
         // Start is called before the first frame update
         void Start()
         {
-            bE = GetComponent<Base>();
-            rb = GetComponent<Rigidbody2D>();
-            highShield = true;
-            shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-            turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
-            timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
+            _bE = GetComponent<Base>();
+            _rb = GetComponent<Rigidbody2D>();
+            lowShield = false;
+            _shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+            _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+            _timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
             turnedAround = false;
-            firstAggro = true;
+            _firstAggro = true;
             canChangeShield = true;
-            bE.isMovingEnemy = false;
+            _bE.isMovingEnemy = false;
+            _bE.damage = Damage;
         }
 
         // Update is called once per frame
         void Update()
         {
-            bE.enemyAnim.SetFloat(AnimatorConstants.Speed, Mathf.Abs(bE.velocity.x));
-            var dx = bE.target.position.x - transform.position.x;
+            _bE.enemyAnim.SetFloat(AnimatorConstants.Speed, Mathf.Abs(_bE.velocity.x));
+            var dx = _bE.target.position.x - transform.position.x;
 
-            if (bE.isAggro)
+            if (_bE.isAggro)
             {
                 //Check if the spearman is in its ideal range of the player
-                if (Mathf.Abs(dx) > idealDistanceFromPlayer && !idealRange)
+                if (Mathf.Abs(dx) > idealDistanceFromPlayer && !_idealRange)
                 {
-                    bE.velocity = new Vector2(dx * bE.moveSpeed, bE.velocity.y);
+                    _bE.velocity = new Vector2(dx * _bE.moveSpeed, _bE.velocity.y);
                 }
                 else {
-                    idealRange = true;
+                    _idealRange = true;
                 }
 
-                if (idealRange)
+                if (_idealRange)
                 {
 
                     //make sure the spearman looks at the player
                     if (dx < 0)
                     {
                     
-                        if (!lookingLeft)
+                        if (!_lookingLeft)
                         {
-                            if (!firstAggro)
+                            if (!_firstAggro)
                             {
-                                turnAroundTimer -= Time.deltaTime;
+                                _turnAroundTimer -= Time.deltaTime;
                                 turnedAround = true;
-                                if (turnAroundTimer < 0)
+                                if (_turnAroundTimer < 0)
                                 {
                                     transform.localScale = new Vector3(-1, 1);
-                                    turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                    _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
                                     turnedAround = false;
-                                    lookingLeft = true;
+                                    _lookingLeft = true;
                                 }
                             }
                             else
                             {
-                                lookingLeft = true;
+                                _lookingLeft = true;
                             }
                         }
                     }
                     if (dx > 0)
                     {
-                        if (lookingLeft)
+                        if (_lookingLeft)
                         {
-                            if (!firstAggro)
+                            if (!_firstAggro)
                             {
-                                turnAroundTimer -= Time.deltaTime;
+                                _turnAroundTimer -= Time.deltaTime;
                                 turnedAround = true;
-                                if (turnAroundTimer < 0)
+                                if (_turnAroundTimer < 0)
                                 {
                                     transform.localScale = new Vector3(1, 1);
-                                    turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                    _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
                                     turnedAround = false;
-                                    lookingLeft = false;
+                                    _lookingLeft = false;
                                 }
                             }
                             else
                             {
-                                lookingLeft = false;
+                                _lookingLeft = false;
                             }
                         }
                     }
 
                     if (Mathf.Abs(dx) > (idealDistanceFromPlayer + 2))
                     {
-                        bE.noTurn = false;
-                        idealRange = false;
+                        _bE.noTurn = false;
+                        _idealRange = false;
                     }
-                    bE.noTurn = true;
+                    _bE.noTurn = true;
 
-                    timerToChangeMovement -= Time.deltaTime;
-                    if(timerToChangeMovement < 0)
+                    _timerToChangeMovement -= Time.deltaTime;
+                    if(_timerToChangeMovement < 0)
                     {
-                        moveLeft = !moveLeft;
-                        timerToChangeMovement = Random.Range(timerToChangeMovementMinMax.x, timerToChangeMovementMinMax.y);
+                        _moveLeft = !_moveLeft;
+                        _timerToChangeMovement = Random.Range(timerToChangeMovementMinMax.x, timerToChangeMovementMinMax.y);
                     }
 
-                    int direction = moveLeft ? 1 : -1;
+                    int direction = _moveLeft ? 1 : -1;
 
-                    bE.velocity = new Vector2(dx * direction * (bE.moveSpeed * slowSpeedMultiplier), bE.velocity.y);
+                    _bE.velocity = new Vector2(dx * direction * (_bE.moveSpeed * slowSpeedMultiplier), _bE.velocity.y);
 
                     attack();
                 }
@@ -145,39 +141,30 @@ namespace Enemy.Spearman
             //Have the spearman switch between high and low shield stances to deflect attacks if they are not attacking
             if (canChangeShield)
             {
-                shieldTimer -= Time.deltaTime;
-                if (shieldTimer <= 0)
+                _shieldTimer -= Time.deltaTime;
+                if (_shieldTimer <= 0)
                 {
-                    if (highShield)
-                    {
-                        lowShield = true;
-                        highShield = false;
-                        shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-                    }
-                    else if (lowShield)
-                    {
-                        highShield = true;
-                        lowShield = false;
-                        shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-                    }
+                    lowShield = !lowShield;
+                    _shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
+
                 }
             }
-            bE.enemyAnim.SetBool(AnimatorConstants.LowShield, lowShield);
-            bE.enemyAnim.SetBool(AnimatorConstants.HighShield, highShield);
+            _bE.enemyAnim.SetBool(AnimatorConstants.LowShield, lowShield);
+            _bE.enemyAnim.SetBool(AnimatorConstants.HighShield, !lowShield);
         }
 
         private void attack()
         {
             if (!isAttacking)
             {
-                timerBetweenAttacks -= Time.deltaTime;
-                if (timerBetweenAttacks <= 0)
+                _timerBetweenAttacks -= Time.deltaTime;
+                if (_timerBetweenAttacks <= 0)
                 {
                     isAttacking = true;
                     canChangeShield = false;
-                    spear.lookingLeft = lookingLeft;
-                    bE.enemyAnim.SetTrigger(AnimatorConstants.Attack1);
-                    timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
+                    spear.lookingLeft = _lookingLeft;
+                    _bE.enemyAnim.SetTrigger(AnimatorConstants.Attack1);
+                    _timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
                 }
             }
         }
@@ -186,9 +173,9 @@ namespace Enemy.Spearman
 
         private void FixedUpdate()
         {
-            if (!bE.health.IsDead() && !isAttacking)
+            if (!_bE.health.IsDead() && !isAttacking)
             {
-                rb.MovePosition(rb.position + bE.velocity * Time.deltaTime);
+                _rb.MovePosition(_rb.position + _bE.velocity * Time.deltaTime);
             }
         }
 
@@ -196,6 +183,14 @@ namespace Enemy.Spearman
         {
             isAttacking = false;
             canChangeShield = true;
+        }
+
+        private void Damage(int damageToTake, bool crouchAttack, Vector3 pos)
+        {
+            if (!turnedAround && crouchAttack == lowShield) return;
+            _bE.health.Damage(damageToTake);
+            _bE.hitEffect.transform.position = pos;
+            _bE.hitEffect.gameObject.SetActive(true);
         }
 
     }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Utility;
 using static Utility.AnimatorConstants;
@@ -38,6 +39,7 @@ namespace Enemy
         public Animator enemyAnim;
 
         private AggroChecker _aggroChecker;
+        public Action<int,bool,Vector3> damage { get; set; }
 
         // Start is called before the first frame update
         void Start()
@@ -51,6 +53,7 @@ namespace Enemy
 
             //Setting up aggro variables
             aggroChecker.size = aggroRange;
+            damage = Damage;
             target = GameObject.FindGameObjectWithTag("Player").transform;
         }
 
@@ -95,9 +98,11 @@ namespace Enemy
             foreach (var t in weapons) Destroy(t);
         }
 
-        public void Damage(int damage)
+        private void Damage(int damageToTake, bool crouchAttack, Vector3 pos)
         {
-            health.Damage(damage);
+            health.Damage(damageToTake);
+            hitEffect.transform.position = pos;
+            hitEffect.gameObject.SetActive(true);
         }
     }
 }
