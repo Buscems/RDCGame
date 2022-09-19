@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Rewired;
 using Rewired.ControllerExtensions;
@@ -361,49 +362,42 @@ namespace Player
 
         private void OnCollisionEnter2D(Collision2D collisionInfo)
         {
-            foreach (ContactPoint2D contact in collisionInfo.contacts)
+            foreach (var contact in collisionInfo.contacts.Select(point2D => point2D.normal).Where(vector2 => Mathf.Abs(vector2.y) > Mathf.Abs(vector2.x)).Select(vector2 => vector2.y))
             {
                 //am I coming from the top/bottom?
-                if (Mathf.Abs(contact.normal.y) > Mathf.Abs(contact.normal.x))
-                {
-                    velocity.y = 0; //stop vertical velocity
-                    if (contact.normal.y >= 0)
-                    { //am I hitting the top of the platform?
+                velocity.y = 0; //stop vertical velocity
+                if (contact >= 0)
+                { //am I hitting the top of the platform?
 
-                        onTopOfPlatform = true;
-                        playerAnimator.SetTrigger("land");
-                    }
-                    //am I hitting the bottom of a platform?
-                    if (contact.normal.y < 0)
-                    {
-                        velocity.y = 0;
-                    }
+                    onTopOfPlatform = true;
+                    playerAnimator.SetTrigger("land");
+                }
+                //am I hitting the bottom of a platform?
+                if (contact < 0)
+                {
+                    velocity.y = 0;
                 }
             }
         }
 
         private void OnCollisionStay2D(Collision2D collisionInfo)
         {
-            foreach (ContactPoint2D contact in collisionInfo.contacts)
+            foreach (var contact in collisionInfo.contacts.Select(point2D => point2D.normal).Where(vector2 => Mathf.Abs(vector2.y) > Mathf.Abs(vector2.x)).Select(vector2 => vector2.y))
             {
-                //am I coming from the top/bottom?
-                if (Mathf.Abs(contact.normal.y) > Mathf.Abs(contact.normal.x))
+                velocity.y = 0; //stop vertical velocity
+                if (contact >= 0)
+                { //am I hitting the top of the platform?
+
+                    onTopOfPlatform = true;
+                }
+                //am I hitting the bottom of a platform?
+                if (contact < 0)
                 {
-                    velocity.y = 0; //stop vertical velocity
-                    if (contact.normal.y >= 0)
-                    { //am I hitting the top of the platform?
+                    //hitHead = true;
+                    velocity.y = 0;
+                    //gotHitTimer = 0;
+                    //maxKnockbackTime = 0;
 
-                        onTopOfPlatform = true;
-                    }
-                    //am I hitting the bottom of a platform?
-                    if (contact.normal.y < 0)
-                    {
-                        //hitHead = true;
-                        velocity.y = 0;
-                        //gotHitTimer = 0;
-                        //maxKnockbackTime = 0;
-
-                    }
                 }
             }
         }
