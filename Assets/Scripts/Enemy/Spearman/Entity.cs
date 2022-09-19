@@ -7,7 +7,7 @@ namespace Enemy.Spearman
     {
         private Base _bE;
         private Rigidbody2D _rb;
-        private float _shieldTimer, _timerBetweenAttacks, _turnAroundTimer, _timerToChangeMovement;
+        private Countdown _shieldTimer, _turnAroundTimer, _timerToChangeMovement, _timerBetweenAttacks;
         private bool _idealRange, _moveLeft, _lookingLeft, _firstAggro;
 
 
@@ -37,9 +37,10 @@ namespace Enemy.Spearman
             _bE = GetComponent<Base>();
             _rb = GetComponent<Rigidbody2D>();
             lowShield = false;
-            _shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-            _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
-            _timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
+            _shieldTimer = new Countdown(minMaxStanceTimer);
+            _turnAroundTimer = new Countdown(turnAroundTimerMinMax);
+            _timerToChangeMovement = new Countdown(timerToChangeMovementMinMax);
+            _timerBetweenAttacks = new Countdown(minMaxAttackDelay);
             turnedAround = false;
             _firstAggro = true;
             canChangeShield = true;
@@ -75,12 +76,11 @@ namespace Enemy.Spearman
                         {
                             if (!_firstAggro)
                             {
-                                _turnAroundTimer -= Time.deltaTime;
                                 turnedAround = true;
-                                if (_turnAroundTimer < 0)
+                                if (_turnAroundTimer.DecrementAndCheck(Time.deltaTime))
                                 {
                                     transform.localScale = new Vector3(-1, 1);
-                                    _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                    _turnAroundTimer.Reset();
                                     turnedAround = false;
                                     _lookingLeft = true;
                                 }
@@ -97,12 +97,11 @@ namespace Enemy.Spearman
                         {
                             if (!_firstAggro)
                             {
-                                _turnAroundTimer -= Time.deltaTime;
                                 turnedAround = true;
-                                if (_turnAroundTimer < 0)
+                                if (_turnAroundTimer.DecrementAndCheck(Time.deltaTime))
                                 {
                                     transform.localScale = new Vector3(1, 1);
-                                    _turnAroundTimer = Random.Range(turnAroundTimerMinMax.x, turnAroundTimerMinMax.y);
+                                    _turnAroundTimer.Reset();
                                     turnedAround = false;
                                     _lookingLeft = false;
                                 }
@@ -121,11 +120,10 @@ namespace Enemy.Spearman
                     }
                     _bE.noTurn = true;
 
-                    _timerToChangeMovement -= Time.deltaTime;
-                    if(_timerToChangeMovement < 0)
+                    if(_timerToChangeMovement.DecrementAndCheck(Time.deltaTime))
                     {
                         _moveLeft = !_moveLeft;
-                        _timerToChangeMovement = Random.Range(timerToChangeMovementMinMax.x, timerToChangeMovementMinMax.y);
+                        _timerToChangeMovement.Reset();
                     }
 
                     int direction = _moveLeft ? 1 : -1;
@@ -139,15 +137,10 @@ namespace Enemy.Spearman
 
 
             //Have the spearman switch between high and low shield stances to deflect attacks if they are not attacking
-            if (canChangeShield)
+            if (canChangeShield && _shieldTimer.DecrementAndCheck(Time.deltaTime))
             {
-                _shieldTimer -= Time.deltaTime;
-                if (_shieldTimer <= 0)
-                {
-                    lowShield = !lowShield;
-                    _shieldTimer = Random.Range(minMaxStanceTimer.x, minMaxStanceTimer.y);
-
-                }
+                lowShield = !lowShield;
+                _shieldTimer.Reset();
             }
             _bE.enemyAnim.SetBool(AnimatorConstants.LowShield, lowShield);
             _bE.enemyAnim.SetBool(AnimatorConstants.HighShield, !lowShield);
@@ -155,18 +148,12 @@ namespace Enemy.Spearman
 
         private void attack()
         {
-            if (!isAttacking)
-            {
-                _timerBetweenAttacks -= Time.deltaTime;
-                if (_timerBetweenAttacks <= 0)
-                {
-                    isAttacking = true;
-                    canChangeShield = false;
-                    spear.lookingLeft = _lookingLeft;
-                    _bE.enemyAnim.SetTrigger(AnimatorConstants.Attack1);
-                    _timerBetweenAttacks = Random.Range(minMaxAttackDelay.x, minMaxAttackDelay.y);
-                }
-            }
+            if (isAttacking || !_timerBetweenAttacks.DecrementAndCheck(Time.deltaTime)) return;
+            isAttacking = true;
+            canChangeShield = false;
+            spear.lookingLeft = _lookingLeft;
+            _bE.enemyAnim.SetTrigger(AnimatorConstants.Attack1);
+            _timerBetweenAttacks.Reset();
         }
 
 

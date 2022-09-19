@@ -245,18 +245,15 @@ namespace Player
                 //jump logic
                 if (Mathf.Abs(velocity.x) > 0)
                 {
-                    if (onPlatformTimer > 0)
+                    if (onPlatformTimer > 0 && myPlayer.GetButtonDown("Jump"))
                     {
-                        if (myPlayer.GetButtonDown("Jump"))
-                        {
-                            velocity.y = movingJumpVel;
-                            jumpTimer = jumpTimerMax;
-                            isJumping = true;
-                            onTopOfPlatform = false;
-                            playerAnimator.ResetTrigger("land");
-                            playerAnimator.SetTrigger("jump");
-                            onPlatformTimer = 0;
-                        }
+                        velocity.y = movingJumpVel;
+                        jumpTimer = jumpTimerMax;
+                        isJumping = true;
+                        onTopOfPlatform = false;
+                        playerAnimator.ResetTrigger("land");
+                        playerAnimator.SetTrigger("jump");
+                        onPlatformTimer = 0;
                     }
                     if (myPlayer.GetButton("Jump") && isJumping)
                     {
@@ -271,17 +268,14 @@ namespace Player
                 }
                 else if (Mathf.Abs(velocity.x) == 0)
                 {
-                    if (onPlatformTimer > 0)
+                    if (onPlatformTimer > 0 && myPlayer.GetButtonDown("Jump"))
                     {
-                        if (myPlayer.GetButtonDown("Jump"))
-                        {
-                            velocity.y = jumpVel;
-                            jumpTimer = jumpTimerMax;
-                            playerAnimator.ResetTrigger("jump");
-                            isJumping = true;
-                            playerAnimator.ResetTrigger("land");
-                            playerAnimator.SetTrigger("jump");
-                        }
+                        velocity.y = jumpVel;
+                        jumpTimer = jumpTimerMax;
+                        playerAnimator.ResetTrigger("jump");
+                        isJumping = true;
+                        playerAnimator.ResetTrigger("land");
+                        playerAnimator.SetTrigger("jump");
                     }
                     if (myPlayer.GetButton("Jump") && isJumping)
                     {
@@ -310,29 +304,20 @@ namespace Player
 
         void SwordAttack()
         {
-            if (!isAttacking)
+            if (isAttacking) return;
+            if (onTopOfPlatform)
             {
-                if (onTopOfPlatform)
-                {
-                    cannotMove = true;
-                    acceleration = 0;
-                    velocity = new Vector2(0, 0);
-                    if (crouch)
-                    {
-                        _attack.crouchAttack = true;
-                    }
-                    else
-                    {
-                        _attack.crouchAttack = false;
-                    }
-                    playerAnimator.SetTrigger("attack");
-                }
-                else
-                {
-                    cannotMove = true;
-                    isJumping = false;
-                    playerAnimator.SetTrigger("attack");
-                }
+                cannotMove = true;
+                acceleration = 0;
+                velocity = new Vector2(0, 0);
+                _attack.crouchAttack = crouch;
+                playerAnimator.SetTrigger("attack");
+            }
+            else
+            {
+                cannotMove = true;
+                isJumping = false;
+                playerAnimator.SetTrigger("attack");
             }
         }
 
@@ -341,7 +326,7 @@ namespace Player
             cannotMove = false;
         }
 
-        void Gravity()
+        private void Gravity()
         {
             //gravity logic
             if (velocity.y > -maxDownVel)
