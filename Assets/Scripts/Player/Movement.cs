@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Rewired;
@@ -12,7 +11,6 @@ namespace Player
 
         //the following is in order to use rewired
         [Tooltip("Reference for using rewired")]
-        [HideInInspector]
         public Rewired.Player myPlayer;
         [Header("Rewired")]
         [Tooltip("Number identifier for each player, must be above 0")]
@@ -34,7 +32,6 @@ namespace Player
         public float inAirAccelerationRate;
         public float accelerationRate;
         public float decelerationRate;
-        string lastDirection;
         bool cannotMove;
 
         [Header("Attack")]
@@ -94,11 +91,7 @@ namespace Player
             }
 
             //make sure sword damage is what the current damage of the player has
-            if(sword.GetComponent<Attack>().damage != currentDamage)
-            {
-                sword.GetComponent<Attack>().damage = currentDamage;
-            }
-
+            sword.GetComponent<Attack>().damage = currentDamage;
         }
 
         private void FixedUpdate()
@@ -119,20 +112,11 @@ namespace Player
             playerAnimator.SetBool("onGround", onTopOfPlatform);
             playerAnimator.SetBool("crouch", crouch);
 
-            if (velocity.x < 0)
-            {
-                lastDirection = "left";
-            }
-            else if(velocity.x > 0)
-            {
-                lastDirection = "right";
-            }
-
-            if (lastDirection == "left")
+            if (velocity.x < 0) // left
             {
                 transform.localScale = new Vector3(-1, 1);
             }
-            if(lastDirection == "right")
+            if(velocity.x > 0) // right
             {
                 transform.localScale = new Vector3(1, 1);
             }
@@ -393,11 +377,7 @@ namespace Player
                 //am I hitting the bottom of a platform?
                 if (contact < 0)
                 {
-                    //hitHead = true;
                     velocity.y = 0;
-                    //gotHitTimer = 0;
-                    //maxKnockbackTime = 0;
-
                 }
             }
         }
